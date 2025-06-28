@@ -1,0 +1,49 @@
+networks:
+  app-network:
+    driver: bridge
+
+services:
+
+  pg:
+    image: postgres:17.4-alpine3.21
+    environment:
+      - "POSTGRES_DB=${PG_DATABASE_NAME}"
+      - "POSTGRES_USER=${PG_USER}"
+      - "POSTGRES_PASSWORD=${PG_PASSWORD}"
+    ports:
+      - "${PG_PORT}:5432"
+#    volumes:
+#      - postgres_volume:/var/lib/postgresql/data
+    restart: unless-stopped
+    networks:
+      - app-network
+    labels:
+      - "app=acid"
+      - "component=database"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${PG_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  adminer:
+    image: adminer:4.8.1
+    restart: unless-stopped
+    ports:
+      - ${ADMINER_PORT}:8080
+    depends_on:
+      - pg
+    networks:
+      - app-network
+    labels:
+      - "app=acid"
+      - "component=adminer"
+
+volumes:
+  postgres_volume:
+    driver: local
+    # driver_opts:
+    #   type: none
+    #   device: ./data/postgres
+    #   o: bind

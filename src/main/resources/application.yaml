@@ -1,0 +1,23 @@
+server:
+  port: ${APP_PORT:8080}
+spring:
+  application:
+    name: acid-demo
+  datasource:
+    password: ${PG_PASSWORD:postgres}
+    url: jdbc:postgresql://${PG_HOST:localhost}:${PG_PORT:5432}/${PG_DATABASE_NAME:acid_demo}
+    username: ${PG_USER:postgres}
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+        jdbc:
+          batch_size: 20
+    show-sql: true
+logging:
+  level:
+    com.example.acid_demo: DEBUG
+    org.springframework.transaction: DEBUG
